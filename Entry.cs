@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UVS_Thread_Exercise
+﻿namespace UVS_Thread_Exercise
 {
     public class Entry
     {
-        long ID;
-        int thread_ID;
-        DateTime generation_time;
+        public long ID { get; private set; }
+        public int ThreadID { get; private set; }
+        public DateTime GenerationTime { get; private set; }   
         
         public Entry(long ID, int thread_ID)
         {
             this.ID = ID;
-            this.thread_ID = thread_ID;
-            generation_time = DateTime.Now;
+            this.ThreadID = thread_ID;
+            GenerationTime = DateTime.Now;
         }
     }
 }
