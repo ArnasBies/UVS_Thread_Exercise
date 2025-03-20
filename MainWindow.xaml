@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UVS_Thread_Exercise"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="500">
+        Title="MainWindow" Height="700" Width="500">
     <Grid>
 
         <Grid.ColumnDefinitions>
@@ -17,6 +17,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*"/>
             <RowDefinition/>
+            <RowDefinition Height="0.1*"/>
         </Grid.RowDefinitions>
 
         <!--main app controls-->
@@ -84,7 +85,7 @@
                                    FontSize="20" 
                                    VerticalAlignment="Center"/>
 
-                        <TextBlock Text="{Binding ID}" 
+                        <TextBlock Text="{Binding Data}" 
                                    Grid.Column ="3" 
                                    FontSize="20" 
                                    VerticalAlignment="Center"/>
@@ -92,5 +93,20 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!--Displaying database path-->
+        <TextBlock Text="Database Path:" 
+                   Grid.Row="2"  
+                   FontSize="15"
+                   VerticalAlignment="Center" 
+                   HorizontalAlignment="Center"/>
+
+        <TextBlock x:Name="TB_DbPath" 
+                   Grid.Row="2" 
+                   Grid.Column="1" 
+                   Grid.ColumnSpan="2" 
+                   FontSize="12"
+                   TextWrapping="Wrap" 
+                   VerticalAlignment="Center"/>
     </Grid>
 </Window>

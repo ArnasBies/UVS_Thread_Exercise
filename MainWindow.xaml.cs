@@ -1,49 +1,32 @@
 ﻿using System.Windows;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Threading;
-
-using Microsoft.Data.Sqlite;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace UVS_Thread_Exercise
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        //using concurrent bag because I needed a thread-safe collection
         public static ConcurrentBag<Entry> generated_numbers;
-        int thread_count;
-
         public ObservableCollection<Entry> list_entries { get; set; }
+
+        private int thread_count;
         private List<ThreadGenerator> thread_generators;
+        private bool checking;
 
         public MainWindow()
         {
-            //initialization pre-logic
+            //initialization logic
             InitializeComponent();
             DataContext = this;
 
             generated_numbers = new ConcurrentBag<Entry>() {};
-            list_entries = new ObservableCollection<Entry>() { new Entry(12412, 1)};
+            list_entries = new ObservableCollection<Entry>() {};
             thread_generators = new List<ThreadGenerator>();
+            checking = false;
 
-            //every 300 miliseconds update the observable list of entries
-            Task.Run(async () => { while (true) {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        list_entries.Clear();
-                        foreach (var number in generated_numbers)
-                        {
-                            list_entries.Add(number);
-                        }
-                    });
-
-                    await Task.Delay(300);
-                }
-            });
+            //db is created in ThreadGenerator.cs and is created in executable directory
+            TB_DbPath.Text = $@"{Environment.CurrentDirectory}\GeneratedNumbers.sqlite";
         }
 
         //event handlers
@@ -65,7 +48,26 @@ namespace UVS_Thread_Exercise
                 TB_ThreadCount.Text = "15";
             }
 
-            //creating all thread generators, not awaiting because they should execute in an infinite loop because until stop is clicked
+            //every 300 miliseconds update the observable list of entries up to 20 elements while checking is turned on
+            checking = true;
+            Task.Run(async () => { while (checking) {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        list_entries.Clear();
+                        foreach (var number in generated_numbers)
+                        {
+                            if (list_entries.Count < 20)
+                                list_entries.Add(number);
+                            else
+                                break;
+                        }
+                    });
+
+                    await Task.Delay(300);
+                }
+            });
+
+            //creating all thread number generators, not awaiting because they should execute in an infinite loop until stop is clicked
             for(int i = 0; i < thread_count; i++)
             {
                 thread_generators.Add(new ThreadGenerator(i + 1));
@@ -80,14 +82,13 @@ namespace UVS_Thread_Exercise
             B_Start.Visibility = Visibility.Visible;
             TB_ThreadCount.Focusable = true;
 
+            //turning off checker task
+            checking = false;
+
+            //turning off all of the thread number generators
             for(int i = 0; i < thread_count; i++)
             {
                 thread_generators[i].Stop();
-            }
-
-            foreach(var entry in generated_numbers)
-            {
-                Trace.WriteLine($"{entry.ThreadID}: {entry.ID}");
             }
         }
     }
